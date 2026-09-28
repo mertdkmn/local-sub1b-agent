@@ -1,0 +1,16 @@
+# Python
+.venv/
+__pycache__/
+*.pyc
+*.pyo
+
+# Data
+data/*.jsonl
+data/*.parquet
+
+# Eval outputs
+experiments/*.csv
+
+# MLX / model caches
+*.gguf
+.mlx/
