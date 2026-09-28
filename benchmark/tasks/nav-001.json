@@ -1,0 +1,13 @@
+{
+  "task_id": "nav-001",
+  "category": "navigation",
+  "goal": "Navigate to the About page",
+  "start_url": "fixtures/index.html",
+  "max_steps": 5,
+  "difficulty": "easy",
+  "oracle": {
+    "type": "final_url",
+    "expected": "fixtures/about.html"
+  },
+  "failure_injection": []
+}

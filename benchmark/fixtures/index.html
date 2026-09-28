@@ -1,0 +1,37 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>Mini Shop — Home</title>
+</head>
+<body>
+  <nav>
+    <a id="nav-home" href="index.html">Home</a>
+    <a id="nav-about" href="about.html">About</a>
+  </nav>
+
+  <h1>Mini Shop</h1>
+
+  <div>
+    <input type="search" id="search-box" placeholder="Search products...">
+    <button id="search-btn">Search</button>
+  </div>
+
+  <h2>Contact form</h2>
+  <form id="contact-form">
+    <label for="name">Name</label>
+    <input type="text" id="name" name="name">
+    <label for="email">Email</label>
+    <input type="email" id="email" name="email">
+    <button type="submit" id="submit-btn">Submit</button>
+  </form>
+  <div id="success" hidden>Form submitted!</div>
+
+  <script>
+    document.getElementById('contact-form').addEventListener('submit', function (e) {
+      e.preventDefault();
+      document.getElementById('success').hidden = false;
+    });
+  </script>
+</body>
+</html>

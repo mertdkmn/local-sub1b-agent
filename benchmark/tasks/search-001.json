@@ -1,0 +1,14 @@
+{
+  "task_id": "search-001",
+  "category": "search",
+  "goal": "Type 'notebook' into the search box",
+  "start_url": "fixtures/index.html",
+  "max_steps": 5,
+  "difficulty": "easy",
+  "oracle": {
+    "type": "form_value",
+    "selector": "#search-box",
+    "value": "notebook"
+  },
+  "failure_injection": []
+}
