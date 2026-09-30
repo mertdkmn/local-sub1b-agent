@@ -30,7 +30,14 @@
   <script>
     document.getElementById('contact-form').addEventListener('submit', function (e) {
       e.preventDefault();
-      document.getElementById('success').hidden = false;
+      // Only show success if both fields are actually filled, so the
+      // dom_state oracle ("#success visible") genuinely means "form submitted",
+      // not "button clicked on an empty form".
+      var name = document.getElementById('name').value.trim();
+      var email = document.getElementById('email').value.trim();
+      if (name !== '' && email !== '') {
+        document.getElementById('success').hidden = false;
+      }
     });
   </script>
 </body>
