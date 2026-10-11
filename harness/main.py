@@ -17,6 +17,10 @@ def main(argv=None) -> int:
     ap.add_argument("--agent", default="random", choices=["random", "mlx"])
     ap.add_argument("--model", default="Qwen/Qwen3-0.6B", help="model for the mlx agent")
     ap.add_argument("--enable-thinking", action="store_true", help="enable Qwen3 thinking mode (default off)")
+    ap.add_argument("--name", default="qwen3-0.6b", help="model_name recorded in the CSV")
+    ap.add_argument("--param-count", type=float, default=0.6, help="params in billions")
+    ap.add_argument("--quantization", default="fp16", help="quantization level")
+    ap.add_argument("--model-size-mb", type=int, default=1200, help="model size on disk in MB")
     ap.add_argument("--tasks-dir", default="benchmark/tasks")
     ap.add_argument("--benchmark-dir", default="benchmark")
     ap.add_argument("--out", default="experiments/experiments.csv")
@@ -29,7 +33,14 @@ def main(argv=None) -> int:
     if args.agent == "random":
         agent = RandomAgent()
     else:
-        agent = MLXAgent(args.model, enable_thinking=args.enable_thinking)
+        agent = MLXAgent(
+            args.model,
+            name=args.name,
+            param_count=args.param_count,
+            quantization=args.quantization,
+            model_size_mb=args.model_size_mb,
+            enable_thinking=args.enable_thinking,
+        )
 
     out_path = root / args.out
     out_path.parent.mkdir(parents=True, exist_ok=True)

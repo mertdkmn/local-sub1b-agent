@@ -36,11 +36,32 @@ _JS_TAG = f"""
 
 _JS_READ = f"""
 () => {{
+  // Best-effort accessible label for a form control: aria-label, then
+  // aria-labelledby, then <label for="id">, then a wrapping <label>. This is
+  // what lets a field like <input id="name"> (no placeholder) show up as
+  // "Name" instead of a bare type string.
+  const labelFor = (el) => {{
+    const aria = el.getAttribute('aria-label');
+    if (aria) return aria.trim();
+    const by = el.getAttribute('aria-labelledby');
+    if (by) {{
+      const ref = document.getElementById(by);
+      if (ref) return (ref.innerText || ref.textContent || '').trim();
+    }}
+    if (el.id) {{
+      const lab = document.querySelector('label[for="' + CSS.escape(el.id) + '"]');
+      if (lab) return (lab.innerText || lab.textContent || '').trim();
+    }}
+    const wrap = el.closest('label');
+    if (wrap) return (wrap.innerText || wrap.textContent || '').trim();
+    return '';
+  }};
   return Array.from(document.querySelectorAll({_TAG_SELECTOR!r})).map(el => ({{
     ref: el.getAttribute('data-ref'),
     tag: el.tagName.toLowerCase(),
     role: el.getAttribute('role') || '',
     text: (el.innerText || el.textContent || '').trim().slice(0, 80),
+    label: labelFor(el).slice(0, 80),
     type: el.getAttribute('type') || '',
     placeholder: el.getAttribute('placeholder') || '',
     value: el.value || '',
@@ -57,6 +78,7 @@ class Element:
     tag: str
     role: str
     text: str
+    label: str
     type: str
     placeholder: str
     value: str
@@ -74,6 +96,7 @@ def observe(page: Page) -> list[Element]:
             tag=r["tag"],
             role=r["role"],
             text=r["text"],
+            label=r["label"],
             type=r["type"],
             placeholder=r["placeholder"],
             value=r["value"],
@@ -93,6 +116,12 @@ def render(elements: list[Element]) -> str:
     """
     lines: list[str] = []
     for el in elements:
-        label = el.text or el.placeholder or el.value or el.href or el.type or el.tag
+        # Priority: the element's own text, then its accessible label, then
+        # placeholder/value/href, then type, then tag as a last resort.
+        label = el.text or el.label or el.placeholder or el.value or el.href or el.type or el.tag
+        # A filled form field shows its current value so the agent can see its
+        # own progress: "Name=John Doe" vs the still-empty "Name".
+        if el.value and el.tag in ("input", "textarea") and (el.label or el.placeholder):
+            label = f"{el.label or el.placeholder}={el.value}"
         lines.append(f"[{el.ref}] <{el.tag}> {label}")
     return "\n".join(lines)

@@ -68,7 +68,7 @@ _SYSTEM_PROMPT = (
     "You are a web-browser automation agent. You are given a goal and a list of "
     "the interactive elements currently on the page. Decide on the single next "
     "action and reply with exactly one tool call, and nothing else.\n"
-    "Use one of these forms:\n"
+    "Tools:\n"
     "- CLICK(ref=N)\n"
     '- TYPE(ref=N, "text")\n'
     "- SCROLL(up) or SCROLL(down)\n"
@@ -77,7 +77,8 @@ _SYSTEM_PROMPT = (
     "- SEARCH(query)\n"
     "- SUBMIT()\n"
     "- WAIT()\n"
-    "Example: CLICK(ref=3)"
+    "Use TYPE to fill a text field, CLICK for buttons and links.\n"
+    'Examples: CLICK(ref=3), TYPE(ref=5, "hello")'
 )
 
 
@@ -91,9 +92,9 @@ def _strip_thinking(text: str) -> str:
 # (regex, builder) pairs tried in order; first match wins. Case-insensitive so
 # the model may emit "click(ref=3)" or "CLICK(ref = 3)" and still parse.
 _PARSERS: list[tuple[re.Pattern, Callable]] = [
-    (re.compile(r"CLICK\s*\(\s*ref\s*=\s*(\d+)\s*\)", re.I),
+    (re.compile(r"CLICK\s*\(\s*(?:ref\s*=\s*)?(\d+)\s*\)", re.I),
      lambda m: Action("CLICK", {"ref": int(m.group(1))})),
-    (re.compile(r'TYPE\s*\(\s*ref\s*=\s*(\d+)\s*,\s*["\'](.+?)["\']\s*\)', re.I),
+    (re.compile(r'TYPE\s*\(\s*(?:ref\s*=\s*)?(\d+)\s*,\s*["\'](.+?)["\']\s*\)', re.I),
      lambda m: Action("TYPE", {"ref": int(m.group(1)), "text": m.group(2)})),
     (re.compile(r"SCROLL\s*\(\s*(up|down)\s*\)", re.I),
      lambda m: Action("SCROLL", {"dir": m.group(1).lower()})),
@@ -120,6 +121,24 @@ def parse_action(text: str) -> Action | None:
     return None
 
 
+def _action_str(action: Action) -> str:
+    """Render an Action back into canonical tool-call text, for the history."""
+    a = action.args
+    if action.tool == "CLICK":
+        return f"CLICK(ref={a.get('ref')})"
+    if action.tool == "TYPE":
+        return f"TYPE(ref={a.get('ref')}, '{a.get('text')}')"
+    if action.tool == "SCROLL":
+        return f"SCROLL({a.get('dir')})"
+    if action.tool == "GOTO":
+        return f"GOTO({a.get('url')})"
+    if action.tool == "SEARCH":
+        return f"SEARCH({a.get('query')})"
+    if action.tool in ("GO_BACK", "SUBMIT", "WAIT"):
+        return f"{action.tool}()"
+    return f"{action.tool}({a})"
+
+
 class MLXAgent(Agent):
     """v2 agent: a Qwen3 sub-1B model emitting tool calls from an a11y observation.
 
@@ -132,20 +151,22 @@ class MLXAgent(Agent):
     silently advancing.
     """
 
-    name = "qwen3-0.6b"
-    # Static metadata surfaced to experiments.csv (see runner.run_task).
-    param_count = 0.6       # billion
-    quantization = "fp16"
-    model_size_mb = 1200    # ~0.6B params * 2 bytes (FP16); approximate
-
     def __init__(
         self,
         model_path: str = "Qwen/Qwen3-0.6B",
+        name: str = "qwen3-0.6b",
+        param_count: float = 0.6,
+        quantization: str = "fp16",
+        model_size_mb: int = 1200,
         max_tokens: int = 512,
         temp: float = 0.0,
         enable_thinking: bool = False,
     ):
         self.model, self.tokenizer = load(model_path)
+        self.name = name
+        self.param_count = param_count
+        self.quantization = quantization
+        self.model_size_mb = model_size_mb
         self.max_tokens = max_tokens
         self.temp = temp
         self.enable_thinking = enable_thinking
@@ -156,6 +177,7 @@ class MLXAgent(Agent):
         self._gen_tokens = 0
         self._gen_seconds = 0.0
         self._peak_ram_mb = 0.0
+        self.history: list[str] = []
 
     @property
     def tokens_per_sec(self) -> float:
@@ -168,16 +190,14 @@ class MLXAgent(Agent):
         return round(self._peak_ram_mb) if self._peak_ram_mb > 0 else None
 
     def act(self, goal: str, observation: str, elements: list[Element]) -> Action:
+        user = f"GOAL: {goal}\n\n"
+        if self.history:
+            user += "Previous actions:\n" + "\n".join(f"- {a}" for a in self.history) + "\n\n"
+        user += "Current page (interactive elements only):\n" + (observation or "(no interactive elements)")
+
         messages = [
             {"role": "system", "content": _SYSTEM_PROMPT},
-            {
-                "role": "user",
-                "content": (
-                    f"GOAL: {goal}\n\n"
-                    "Current page (interactive elements only):\n"
-                    f"{observation or '(no interactive elements)'}"
-                ),
-            },
+            {"role": "user", "content": user},
         ]
         prompt = self.tokenizer.apply_chat_template(
             messages,
@@ -208,4 +228,5 @@ class MLXAgent(Agent):
         action = parse_action(raw)
         if action is None:
             return Action("UNPARSEABLE", {})
+        self.history.append(_action_str(action))
         return action
