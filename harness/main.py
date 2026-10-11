@@ -7,14 +7,16 @@ from pathlib import Path
 
 from playwright.sync_api import sync_playwright
 
-from .agents import RandomAgent
+from .agents import MLXAgent, RandomAgent
 from .runner import CSV_COLUMNS, run_task
 from .tasks import load_tasks
 
 
 def main(argv=None) -> int:
     ap = argparse.ArgumentParser(description="sub1b-agent eval harness v1")
-    ap.add_argument("--agent", default="random", choices=["random"])
+    ap.add_argument("--agent", default="random", choices=["random", "mlx"])
+    ap.add_argument("--model", default="Qwen/Qwen3-0.6B", help="model for the mlx agent")
+    ap.add_argument("--enable-thinking", action="store_true", help="enable Qwen3 thinking mode (default off)")
     ap.add_argument("--tasks-dir", default="benchmark/tasks")
     ap.add_argument("--benchmark-dir", default="benchmark")
     ap.add_argument("--out", default="experiments/experiments.csv")
@@ -24,7 +26,10 @@ def main(argv=None) -> int:
     tasks = load_tasks(root / args.tasks_dir)
     benchmark_dir = root / args.benchmark_dir
 
-    agent = {"random": RandomAgent()}[args.agent]
+    if args.agent == "random":
+        agent = RandomAgent()
+    else:
+        agent = MLXAgent(args.model, enable_thinking=args.enable_thinking)
 
     out_path = root / args.out
     out_path.parent.mkdir(parents=True, exist_ok=True)
@@ -43,9 +48,13 @@ def main(argv=None) -> int:
             )
         browser.close()
 
-    with out_path.open("w", newline="") as f:
+    # Append to the shared experiments.csv (one row per run), writing the header
+    # only when the file is new/empty — matches RESEARCH_PLAN §11.
+    new_file = not out_path.exists() or out_path.stat().st_size == 0
+    with out_path.open("a", newline="") as f:
         writer = csv.DictWriter(f, fieldnames=CSV_COLUMNS)
-        writer.writeheader()
+        if new_file:
+            writer.writeheader()
         writer.writerows(rows)
 
     print(f"\nwrote {len(rows)} rows -> {out_path}")

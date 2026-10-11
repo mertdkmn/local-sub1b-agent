@@ -8,7 +8,7 @@ See [`RESEARCH_PLAN.md`](RESEARCH_PLAN.md) for the full plan, locked decisions, 
 
 ## TL;DR
 
-- **Student**: sub-1B pretrained Transformer (start with Qwen3-0.6B-Instruct), fine-tuned with LoRA.
+- **Student**: sub-1B pretrained Transformer (start with Qwen3-0.6B base), fine-tuned with LoRA.
 - **Teacher**: Qwen3-4B (4-bit) generates trajectories + injected-failure recovery data.
 - **Environment**: Playwright-controlled browser, a11y-tree observations, 8 tools.
 - **Inference**: local on Apple Silicon via MLX (consumer hardware is the research constraint, not just a runtime).
@@ -50,7 +50,7 @@ experiments/   # experiments.csv + frontier plots
 - [x] Scaffold + git init
 - [x] Python environment (venv)
 - [x] RESEARCH_PLAN.md
-- [ ] Dependencies (playwright, mlx-lm)
-- [ ] Benchmark schema + sample tasks
-- [ ] Eval harness v1
-- [ ] Zero-shot baseline (Qwen3-0.6B-Instruct)
+- [x] Dependencies (playwright, mlx-lm)
+- [x] Benchmark schema + sample tasks
+- [x] Eval harness v1 (RandomAgent + MLXAgent)
+- [x] Zero-shot baseline (Qwen3-0.6B base, 33%)

@@ -30,6 +30,7 @@ CSV_COLUMNS = [
 
 def run_task(task, agent: Agent, page: Page, base_dir: Path) -> dict:
     start = time.perf_counter()
+    agent.reset()
     # Systemic guard: cap every locator action at 3s. Playwright auto-waits up
     # to 30s by default; on local fixtures 3s is plenty, and it means no tool
     # can ever stall the harness (this is the "timeout" failure type).
@@ -58,8 +59,8 @@ def run_task(task, agent: Agent, page: Page, base_dir: Path) -> dict:
     # P2 (training). peak_ram_mb is model-memory-dependent too, so None for now.
     return {
         "model_name": agent.name,
-        "param_count": 0,
-        "quantization": "none",
+        "param_count": getattr(agent, "param_count", 0),
+        "quantization": getattr(agent, "quantization", "none"),
         "observation_type": "compact_interactive",
         "context_length": None,
         "tool_count": len(TOOL_NAMES),
@@ -73,9 +74,9 @@ def run_task(task, agent: Agent, page: Page, base_dir: Path) -> dict:
         "success": success,
         "steps": steps,
         "latency_ms": round((time.perf_counter() - start) * 1000, 1),
-        "tokens_per_sec": 0,
-        "peak_ram_mb": None,
-        "model_size_mb": 0,
+        "tokens_per_sec": getattr(agent, "tokens_per_sec", 0),
+        "peak_ram_mb": getattr(agent, "peak_ram_mb", None),
+        "model_size_mb": getattr(agent, "model_size_mb", 0),
         "tool_errors": tool_errors,
         "recovery_success": None,
     }

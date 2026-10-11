@@ -31,7 +31,7 @@ Therefore the project centers on **reliability, recovery, and efficiency** — n
 
 ## 4. Locked Design Decisions
 
-1. **Fine-tune a pretrained sub-1B Transformer FIRST.** Start with Qwen3-0.6B-Instruct. SAN/Needle-style architecture is a later phase (P4), not a Phase-1 variable.
+1. **Fine-tune a pretrained sub-1B Transformer FIRST.** Start with Qwen3-0.6B (base). SAN/Needle-style architecture is a later phase (P4), not a Phase-1 variable.
 2. **"Local" = inference/deployment constraint only.** Training may use cloud GPU. Inference runs on Apple Silicon via MLX.
 3. **Dataset/trajectory pipeline is the center of P0/P1.** The ~4B teacher (Qwen3-4B) is a *data generator*, not just an oracle.
 4. **Teacher and student share the same observation/tool interface** (a11y tree). Otherwise trajectories are out-of-distribution and distillation fails.
@@ -60,6 +60,8 @@ Off-the-shelf sub-1B checkpoints come in fixed sizes. There is **no 0.8B checkpo
 ```
 
 Getting an 0.8B model would require pruning (1.7B → 0.8B) or from-scratch training — a later, separate experiment (P4).
+
+Note: Qwen3-0.6B is **base-only** — there is no `Qwen3-0.6B-Instruct` (Instruct variants start at 1.7B). The zero-shot baseline therefore uses the base model.
 
 ## 7. System Flow
 
@@ -206,7 +208,7 @@ Pilot protocol: every experiment starts with 30–50 tasks; if promising, scale 
 
 | Phase | Work | Output |
 |---|---|---|
-| **P0** | Eval harness + ~40-task benchmark + zero-shot Qwen3-0.6B-Instruct baseline | Origin point of the frontier |
+| **P0** | Eval harness + ~40-task benchmark + zero-shot Qwen3-0.6B (base) baseline | Origin point of the frontier |
 | **P1** | Qwen3-4B (4-bit) teacher + trajectory collector + failure injection | Dataset v1 |
 | **P2** | Qwen3-0.6B LoRA SFT on Dataset v1 | First result: did distillation move the frontier? |
 | **P3** | Single-variable sweeps (observation, loss, tool space, recovery, context, quant) | Causal contribution of each variable |
