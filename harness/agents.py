@@ -77,7 +77,8 @@ _SYSTEM_PROMPT = (
     "- SEARCH(query)\n"
     "- SUBMIT()\n"
     "- WAIT()\n"
-    "Use TYPE to fill a text field, CLICK for buttons and links.\n"
+    "Use TYPE to fill a text field, CLICK for buttons and links. Fill every "
+    "required field before submitting a form.\n"
     'Examples: CLICK(ref=3), TYPE(ref=5, "hello")'
 )
 
@@ -121,13 +122,20 @@ def parse_action(text: str) -> Action | None:
     return None
 
 
-def _action_str(action: Action) -> str:
-    """Render an Action back into canonical tool-call text, for the history."""
+def _action_str(action: Action, label_by_ref: dict[int, str]) -> str:
+    """Render an Action back into self-descriptive text for the history.
+
+    The ref is replaced by the element's label (e.g. "CLICK(Products)" instead of
+    "CLICK(ref=2)"), so the model can see *what* it acted on — refs are opaque
+    and shift between pages.
+    """
     a = action.args
+    ref = a.get("ref")
+    label = label_by_ref.get(ref, f"ref={ref}") if ref is not None else ""
     if action.tool == "CLICK":
-        return f"CLICK(ref={a.get('ref')})"
+        return f"CLICK({label})"
     if action.tool == "TYPE":
-        return f"TYPE(ref={a.get('ref')}, '{a.get('text')}')"
+        return f"TYPE({label}, '{a.get('text')}')"
     if action.tool == "SCROLL":
         return f"SCROLL({a.get('dir')})"
     if action.tool == "GOTO":
@@ -228,5 +236,9 @@ class MLXAgent(Agent):
         action = parse_action(raw)
         if action is None:
             return Action("UNPARSEABLE", {})
-        self.history.append(_action_str(action))
+        label_by_ref = {
+            el.ref: (el.text or el.label or el.placeholder or el.value or el.href or el.type or el.tag)
+            for el in elements
+        }
+        self.history.append(_action_str(action, label_by_ref))
         return action

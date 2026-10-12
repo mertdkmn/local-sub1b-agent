@@ -1,0 +1,14 @@
+{
+  "task_id": "form-004",
+  "category": "form",
+  "goal": "Type 'alice@example.com' into the email field",
+  "start_url": "fixtures/index.html",
+  "max_steps": 5,
+  "difficulty": "easy",
+  "oracle": {
+    "type": "form_value",
+    "selector": "#email",
+    "value": "alice@example.com"
+  },
+  "failure_injection": []
+}

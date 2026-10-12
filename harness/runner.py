@@ -43,7 +43,8 @@ def run_task(task, agent: Agent, page: Page, base_dir: Path) -> dict:
 
     for steps in range(1, task.max_steps + 1):
         elements = observe(page)
-        observation = render(elements)
+        page_name = page.url.rstrip("/").split("/")[-1]
+        observation = f"Page: {page_name}\n{render(elements)}"
 
         action = agent.act(task.goal, observation, elements)
         error = execute(page, action, base_dir)

@@ -1,0 +1,14 @@
+{
+  "task_id": "form-002",
+  "category": "form",
+  "goal": "Log in by entering a username and password",
+  "start_url": "fixtures/login.html",
+  "max_steps": 10,
+  "difficulty": "medium",
+  "oracle": {
+    "type": "dom_state",
+    "selector": "#login-success",
+    "condition": "visible"
+  },
+  "failure_injection": []
+}

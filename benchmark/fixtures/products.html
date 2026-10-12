@@ -1,0 +1,45 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>Mini Shop — Products</title>
+</head>
+<body>
+  <nav>
+    <a id="nav-home" href="index.html">Home</a>
+    <a id="nav-about" href="about.html">About</a>
+    <a id="nav-products" href="products.html">Products</a>
+    <a id="nav-login" href="login.html">Login</a>
+  </nav>
+
+  <h1>Products</h1>
+
+  <div class="product">
+    <h3>Notebook</h3>
+    <p>$999</p>
+    <button class="add-to-cart" data-product="notebook">Add to cart</button>
+  </div>
+  <div class="product">
+    <h3>Phone</h3>
+    <p>$699</p>
+    <button class="add-to-cart" data-product="phone">Add to cart</button>
+  </div>
+  <div class="product">
+    <h3>Tablet</h3>
+    <p>$499</p>
+    <button class="add-to-cart" data-product="tablet">Add to cart</button>
+  </div>
+
+  <p>Cart: <span id="cart-count">0</span> item(s)</p>
+
+  <script>
+    let count = 0;
+    document.querySelectorAll('.add-to-cart').forEach(function (btn) {
+      btn.addEventListener('click', function () {
+        count += 1;
+        document.getElementById('cart-count').textContent = String(count);
+      });
+    });
+  </script>
+</body>
+</html>

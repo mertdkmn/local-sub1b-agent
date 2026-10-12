@@ -1,0 +1,14 @@
+{
+  "task_id": "multi-005",
+  "category": "multi_step",
+  "goal": "Go back to the Home page and search for 'tablet'",
+  "start_url": "fixtures/products.html",
+  "max_steps": 10,
+  "difficulty": "medium",
+  "oracle": {
+    "type": "form_value",
+    "selector": "#search-box",
+    "value": "tablet"
+  },
+  "failure_injection": []
+}

@@ -1,0 +1,13 @@
+{
+  "task_id": "nav-002",
+  "category": "navigation",
+  "goal": "Go to the Products page",
+  "start_url": "fixtures/index.html",
+  "max_steps": 5,
+  "difficulty": "easy",
+  "oracle": {
+    "type": "final_url",
+    "expected": "fixtures/products.html"
+  },
+  "failure_injection": []
+}

@@ -1,0 +1,14 @@
+{
+  "task_id": "form-003",
+  "category": "form",
+  "goal": "Type 'John' into the name field",
+  "start_url": "fixtures/index.html",
+  "max_steps": 5,
+  "difficulty": "easy",
+  "oracle": {
+    "type": "form_value",
+    "selector": "#name",
+    "value": "John"
+  },
+  "failure_injection": []
+}

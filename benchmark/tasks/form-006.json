@@ -1,0 +1,14 @@
+{
+  "task_id": "form-006",
+  "category": "form",
+  "goal": "Type 'secret123' into the password field",
+  "start_url": "fixtures/login.html",
+  "max_steps": 5,
+  "difficulty": "easy",
+  "oracle": {
+    "type": "form_value",
+    "selector": "#password",
+    "value": "secret123"
+  },
+  "failure_injection": []
+}

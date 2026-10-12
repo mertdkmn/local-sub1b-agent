@@ -1,0 +1,14 @@
+{
+  "task_id": "search-004",
+  "category": "search",
+  "goal": "Search for 'laptop'",
+  "start_url": "fixtures/index.html",
+  "max_steps": 5,
+  "difficulty": "easy",
+  "oracle": {
+    "type": "form_value",
+    "selector": "#search-box",
+    "value": "laptop"
+  },
+  "failure_injection": []
+}

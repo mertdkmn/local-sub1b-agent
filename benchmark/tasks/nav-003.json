@@ -1,0 +1,13 @@
+{
+  "task_id": "nav-003",
+  "category": "navigation",
+  "goal": "Go to the Login page",
+  "start_url": "fixtures/index.html",
+  "max_steps": 5,
+  "difficulty": "easy",
+  "oracle": {
+    "type": "final_url",
+    "expected": "fixtures/login.html"
+  },
+  "failure_injection": []
+}

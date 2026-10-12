@@ -1,0 +1,14 @@
+{
+  "task_id": "form-005",
+  "category": "form",
+  "goal": "Type 'admin' into the username field",
+  "start_url": "fixtures/login.html",
+  "max_steps": 5,
+  "difficulty": "easy",
+  "oracle": {
+    "type": "form_value",
+    "selector": "#username",
+    "value": "admin"
+  },
+  "failure_injection": []
+}

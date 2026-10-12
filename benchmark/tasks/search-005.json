@@ -1,0 +1,14 @@
+{
+  "task_id": "search-005",
+  "category": "search",
+  "goal": "Search for 'headphones'",
+  "start_url": "fixtures/index.html",
+  "max_steps": 5,
+  "difficulty": "easy",
+  "oracle": {
+    "type": "form_value",
+    "selector": "#search-box",
+    "value": "headphones"
+  },
+  "failure_injection": []
+}

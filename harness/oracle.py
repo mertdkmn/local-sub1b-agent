@@ -35,4 +35,12 @@ def check(task, page: Page) -> bool:
             return loc.count() > 0 and loc.is_visible()
         raise ValueError(f"unknown condition: {o['condition']}")
 
+    if t == "text":
+        # The element's visible text equals ``expected`` (e.g. a cart counter
+        # that has incremented to "1").
+        loc = page.locator(o["selector"])
+        if loc.count() == 0:
+            return False
+        return loc.first.inner_text().strip() == o["expected"]
+
     raise ValueError(f"unknown oracle type: {t}")
