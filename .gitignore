@@ -5,8 +5,8 @@ __pycache__/
 *.pyo
 
 # Data
-data/*.jsonl
-data/*.parquet
+data/**/*.jsonl
+data/**/*.parquet
 
 # Eval outputs
 experiments/*.csv

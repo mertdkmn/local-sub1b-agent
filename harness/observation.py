@@ -87,9 +87,21 @@ class Element:
 
 
 def observe(page: Page) -> list[Element]:
-    """Tag interactive elements and return them in DOM order."""
-    page.evaluate(_JS_TAG)
-    rows = page.evaluate(_JS_READ)
+    """Tag interactive elements and return them in DOM order.
+
+    Retries once on a mid-navigation race ("Execution context was destroyed"),
+    which can follow a link click or failed GOTO that leaves the frame between
+    documents. Re-running is safe: ``_JS_TAG`` re-tags idempotently.
+    """
+    for attempt in (0, 1):
+        try:
+            page.evaluate(_JS_TAG)
+            rows = page.evaluate(_JS_READ)
+            break
+        except Exception as exc:  # noqa: BLE001 — Playwright raises typed errors
+            if attempt == 1 or "Execution context was destroyed" not in str(exc):
+                raise
+            page.wait_for_timeout(200)
     return [
         Element(
             ref=int(r["ref"]),
@@ -125,3 +137,25 @@ def render(elements: list[Element]) -> str:
             label = f"{el.label or el.placeholder}={el.value}"
         lines.append(f"[{el.ref}] <{el.tag}> {label}")
     return "\n".join(lines)
+
+
+def label_by_ref(elements: list[Element]) -> dict[int, str]:
+    """Map each element's ref to its best available display label.
+
+    Shared by MLXAgent (to build action history) and the trajectory collector (to
+    record the same labels), so both reconstruct history identically.
+    """
+    return {
+        el.ref: (el.text or el.label or el.placeholder or el.value or el.href or el.type or el.tag)
+        for el in elements
+    }
+
+
+def build_observation(page_name: str, elements: list[Element], error: str = "") -> str:
+    """The observation string the agent sees: optional error line + page + a11y tree.
+
+    The error (from the previous step's failed action) is prepended so recovery
+    trajectories teach "on error, re-observe" (RESEARCH_PLAN §10).
+    """
+    prefix = f"ERROR: {error}\n" if error else ""
+    return f"{prefix}Page: {page_name}\n{render(elements)}"

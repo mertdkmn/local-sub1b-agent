@@ -16,7 +16,7 @@ import mlx.core as mx
 from mlx_lm import load, stream_generate
 from mlx_lm.sample_utils import make_sampler
 
-from .observation import Element
+from .observation import Element, label_by_ref
 from .tools import Action, TOOL_NAMES
 
 
@@ -64,7 +64,7 @@ class RandomAgent(Agent):
         return Action(tool=tool, args=args)
 
 
-_SYSTEM_PROMPT = (
+SYSTEM_PROMPT = (
     "You are a web-browser automation agent. You are given a goal and a list of "
     "the interactive elements currently on the page. Decide on the single next "
     "action and reply with exactly one tool call, and nothing else.\n"
@@ -122,7 +122,7 @@ def parse_action(text: str) -> Action | None:
     return None
 
 
-def _action_str(action: Action, label_by_ref: dict[int, str]) -> str:
+def action_to_label(action: Action, labels: dict[int, str]) -> str:
     """Render an Action back into self-descriptive text for the history.
 
     The ref is replaced by the element's label (e.g. "CLICK(Products)" instead of
@@ -131,7 +131,7 @@ def _action_str(action: Action, label_by_ref: dict[int, str]) -> str:
     """
     a = action.args
     ref = a.get("ref")
-    label = label_by_ref.get(ref, f"ref={ref}") if ref is not None else ""
+    label = labels.get(ref, f"ref={ref}") if ref is not None else ""
     if action.tool == "CLICK":
         return f"CLICK({label})"
     if action.tool == "TYPE":
@@ -145,6 +145,42 @@ def _action_str(action: Action, label_by_ref: dict[int, str]) -> str:
     if action.tool in ("GO_BACK", "SUBMIT", "WAIT"):
         return f"{action.tool}()"
     return f"{action.tool}({a})"
+
+
+def action_to_call(action: Action) -> str:
+    """Render an Action into its canonical *parseable* tool call — the SFT target.
+
+    This is the inverse of ``parse_action``: the exact string the student is
+    trained to emit (e.g. "CLICK(ref=3)", "TYPE(ref=5, 'hello')").
+    """
+    a = action.args
+    if action.tool == "CLICK":
+        return f"CLICK(ref={a.get('ref')})"
+    if action.tool == "TYPE":
+        return f"TYPE(ref={a.get('ref')}, {a.get('text')!r})"
+    if action.tool == "SCROLL":
+        return f"SCROLL({a.get('dir')})"
+    if action.tool == "GOTO":
+        return f"GOTO({a.get('url')})"
+    if action.tool == "SEARCH":
+        return f"SEARCH({a.get('query')})"
+    if action.tool in ("GO_BACK", "SUBMIT", "WAIT"):
+        return f"{action.tool}()"
+    return f"{action.tool}({a})"
+
+
+def build_user_message(goal: str, history: list[str], observation: str) -> str:
+    """Assemble the user turn the model conditions on (goal + history + observation).
+
+    Extracted from ``MLXAgent.act`` so the trajectory collector / SFT converter
+    build the *identical* prompt — otherwise training data would be
+    out-of-distribution (RESEARCH_PLAN §4: teacher and student share the interface).
+    """
+    user = f"GOAL: {goal}\n\n"
+    if history:
+        user += "Previous actions:\n" + "\n".join(f"- {a}" for a in history) + "\n\n"
+    user += "Current page (interactive elements only):\n" + (observation or "(no interactive elements)")
+    return user
 
 
 class MLXAgent(Agent):
@@ -186,6 +222,7 @@ class MLXAgent(Agent):
         self._gen_seconds = 0.0
         self._peak_ram_mb = 0.0
         self.history: list[str] = []
+        self.last_raw: str | None = None
 
     @property
     def tokens_per_sec(self) -> float:
@@ -198,13 +235,9 @@ class MLXAgent(Agent):
         return round(self._peak_ram_mb) if self._peak_ram_mb > 0 else None
 
     def act(self, goal: str, observation: str, elements: list[Element]) -> Action:
-        user = f"GOAL: {goal}\n\n"
-        if self.history:
-            user += "Previous actions:\n" + "\n".join(f"- {a}" for a in self.history) + "\n\n"
-        user += "Current page (interactive elements only):\n" + (observation or "(no interactive elements)")
-
+        user = build_user_message(goal, self.history, observation)
         messages = [
-            {"role": "system", "content": _SYSTEM_PROMPT},
+            {"role": "system", "content": SYSTEM_PROMPT},
             {"role": "user", "content": user},
         ]
         prompt = self.tokenizer.apply_chat_template(
@@ -233,12 +266,9 @@ class MLXAgent(Agent):
                 self._peak_ram_mb, mx.get_peak_memory() / (1024 * 1024)
             )
 
+        self.last_raw = raw
         action = parse_action(raw)
         if action is None:
             return Action("UNPARSEABLE", {})
-        label_by_ref = {
-            el.ref: (el.text or el.label or el.placeholder or el.value or el.href or el.type or el.tag)
-            for el in elements
-        }
-        self.history.append(_action_str(action, label_by_ref))
+        self.history.append(action_to_label(action, label_by_ref(elements)))
         return action

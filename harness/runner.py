@@ -13,7 +13,7 @@ from pathlib import Path
 from playwright.sync_api import Page
 
 from .agents import Agent
-from .observation import observe, render
+from .observation import build_observation, observe
 from .oracle import check
 from .tools import TOOL_NAMES, execute
 
@@ -40,16 +40,18 @@ def run_task(task, agent: Agent, page: Page, base_dir: Path) -> dict:
     tool_errors = 0
     success = False
     steps = 0
+    last_error = ""
 
     for steps in range(1, task.max_steps + 1):
         elements = observe(page)
         page_name = page.url.rstrip("/").split("/")[-1]
-        observation = f"Page: {page_name}\n{render(elements)}"
+        observation = build_observation(page_name, elements, last_error)
 
         action = agent.act(task.goal, observation, elements)
         error = execute(page, action, base_dir)
         if error:
             tool_errors += 1
+        last_error = error
 
         if check(task, page):
             success = True

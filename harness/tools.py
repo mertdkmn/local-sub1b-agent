@@ -51,9 +51,11 @@ def execute(page: Page, action: Action, base_dir: Path) -> str:
             dy = 500 if a.get("dir") == "down" else -500
             page.evaluate(f"window.scrollBy(0, {dy})")
         elif action.tool == "GO_BACK":
-            # go_back() would otherwise wait up to 30s for a navigation that
-            # never happens when there's no history — fail fast instead.
-            if page.evaluate("history.length") <= 1:
+            # History always starts at [about:blank, start_url], so length <= 2
+            # means the agent is still on the start page with nothing valid to go
+            # back to — fail fast instead of navigating to about:blank (which
+            # also destabilizes the frame for the next observation).
+            if page.evaluate("history.length") <= 2:
                 return "GO_BACK error: no history"
             page.go_back()
         elif action.tool == "GOTO":
