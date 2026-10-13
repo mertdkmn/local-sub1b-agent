@@ -54,5 +54,5 @@ experiments/   # experiments.csv + frontier plots
 - [x] Benchmark schema + sample tasks
 - [x] Eval harness v1 (RandomAgent + MLXAgent)
 - [x] Zero-shot baseline (Qwen3-0.6B base, 33%)
-- [x] Teacher (Qwen3-4B 4-bit) + 25-task benchmark (88%)
+- [x] Teacher (Qwen3-4B 4-bit) + 45-task benchmark (91%)
 - [x] Trajectory collector + failure injection → Dataset v1 (P1)
