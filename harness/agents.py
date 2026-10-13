@@ -205,8 +205,9 @@ class MLXAgent(Agent):
         max_tokens: int = 512,
         temp: float = 0.0,
         enable_thinking: bool = False,
+        adapter_path: str | None = None,
     ):
-        self.model, self.tokenizer = load(model_path)
+        self.model, self.tokenizer = load(model_path, adapter_path=adapter_path)
         self.name = name
         self.param_count = param_count
         self.quantization = quantization

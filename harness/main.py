@@ -17,6 +17,7 @@ def main(argv=None) -> int:
     ap.add_argument("--agent", default="random", choices=["random", "mlx"])
     ap.add_argument("--model", default="Qwen/Qwen3-0.6B", help="model for the mlx agent")
     ap.add_argument("--enable-thinking", action="store_true", help="enable Qwen3 thinking mode (default off)")
+    ap.add_argument("--adapter-path", default=None, help="LoRA adapter dir to load (fine-tuned student)")
     ap.add_argument("--name", default="qwen3-0.6b", help="model_name recorded in the CSV")
     ap.add_argument("--param-count", type=float, default=0.6, help="params in billions")
     ap.add_argument("--quantization", default="fp16", help="quantization level")
@@ -40,6 +41,7 @@ def main(argv=None) -> int:
             quantization=args.quantization,
             model_size_mb=args.model_size_mb,
             enable_thinking=args.enable_thinking,
+            adapter_path=args.adapter_path,
         )
 
     out_path = root / args.out

@@ -11,6 +11,9 @@ data/**/*.parquet
 # Eval outputs
 experiments/*.csv
 
+# Training outputs (LoRA adapter weights)
+training/adapters/
+
 # MLX / model caches
 *.gguf
 .mlx/
