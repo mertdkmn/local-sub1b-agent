@@ -1,0 +1,14 @@
+{
+  "task_id": "form-011",
+  "category": "form",
+  "goal": "Type 'hunter2' into the password field",
+  "start_url": "fixtures/login.html",
+  "max_steps": 5,
+  "difficulty": "easy",
+  "oracle": {
+    "type": "form_value",
+    "selector": "#password",
+    "value": "hunter2"
+  },
+  "failure_injection": []
+}

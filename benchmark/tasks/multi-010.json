@@ -1,0 +1,14 @@
+{
+  "task_id": "multi-010",
+  "category": "multi_step",
+  "goal": "Go to the Login page and type 'root' as the username",
+  "start_url": "fixtures/products.html",
+  "max_steps": 8,
+  "difficulty": "medium",
+  "oracle": {
+    "type": "form_value",
+    "selector": "#username",
+    "value": "root"
+  },
+  "failure_injection": []
+}

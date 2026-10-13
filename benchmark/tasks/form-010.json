@@ -1,0 +1,14 @@
+{
+  "task_id": "form-010",
+  "category": "form",
+  "goal": "Type 'Eve' into the name field",
+  "start_url": "fixtures/index.html",
+  "max_steps": 5,
+  "difficulty": "easy",
+  "oracle": {
+    "type": "form_value",
+    "selector": "#name",
+    "value": "Eve"
+  },
+  "failure_injection": []
+}

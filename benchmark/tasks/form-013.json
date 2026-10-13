@@ -1,0 +1,14 @@
+{
+  "task_id": "form-013",
+  "category": "form",
+  "goal": "Type 'guest' into the username field",
+  "start_url": "fixtures/login.html",
+  "max_steps": 5,
+  "difficulty": "easy",
+  "oracle": {
+    "type": "form_value",
+    "selector": "#username",
+    "value": "guest"
+  },
+  "failure_injection": []
+}

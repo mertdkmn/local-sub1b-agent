@@ -1,0 +1,14 @@
+{
+  "task_id": "multi-007",
+  "category": "multi_step",
+  "goal": "Go to the Login page and type 'secret123' as the password",
+  "start_url": "fixtures/index.html",
+  "max_steps": 8,
+  "difficulty": "medium",
+  "oracle": {
+    "type": "form_value",
+    "selector": "#password",
+    "value": "secret123"
+  },
+  "failure_injection": []
+}

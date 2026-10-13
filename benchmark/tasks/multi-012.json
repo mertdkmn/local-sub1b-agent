@@ -1,0 +1,14 @@
+{
+  "task_id": "multi-012",
+  "category": "multi_step",
+  "goal": "Go to the Home page and search for 'laptop'",
+  "start_url": "fixtures/about.html",
+  "max_steps": 10,
+  "difficulty": "medium",
+  "oracle": {
+    "type": "form_value",
+    "selector": "#search-box",
+    "value": "laptop"
+  },
+  "failure_injection": []
+}

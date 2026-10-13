@@ -1,0 +1,14 @@
+{
+  "task_id": "multi-009",
+  "category": "multi_step",
+  "goal": "Go to the Products page and add an item to the cart",
+  "start_url": "fixtures/login.html",
+  "max_steps": 10,
+  "difficulty": "medium",
+  "oracle": {
+    "type": "text",
+    "selector": "#cart-count",
+    "expected": "1"
+  },
+  "failure_injection": []
+}

@@ -1,0 +1,14 @@
+{
+  "task_id": "multi-011",
+  "category": "multi_step",
+  "goal": "Go to the Home page and fill the name field with 'Mike'",
+  "start_url": "fixtures/login.html",
+  "max_steps": 8,
+  "difficulty": "medium",
+  "oracle": {
+    "type": "form_value",
+    "selector": "#name",
+    "value": "Mike"
+  },
+  "failure_injection": []
+}
