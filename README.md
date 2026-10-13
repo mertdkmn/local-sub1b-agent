@@ -56,4 +56,4 @@ experiments/   # experiments.csv + frontier plots
 - [x] Zero-shot baseline (Qwen3-0.6B base, 33%)
 - [x] Teacher (Qwen3-4B 4-bit) + 45-task benchmark (91%)
 - [x] Trajectory collector + failure injection → Dataset v1 (P1)
-- [x] P2 LoRA SFT: 0.6B student 35.6% → 95.6% (beats 91% teacher, same-task)
+- [x] P2 LoRA SFT: 0.6B student 35.6% → 95.6% std / 94% recovery (beats 91%/81% teacher, same-task)

@@ -115,6 +115,7 @@ def main(argv=None) -> int:
     ap.add_argument("--model-size-mb", type=int, default=2000)
     ap.add_argument("--max-tokens", type=int, default=512)
     ap.add_argument("--enable-thinking", action="store_true", help="default off (teacher is better without)")
+    ap.add_argument("--adapter-path", default=None, help="LoRA adapter dir to load (fine-tuned student)")
     ap.add_argument("--tasks-dir", default="benchmark/tasks")
     ap.add_argument("--benchmark-dir", default="benchmark")
     ap.add_argument("--out-dir", default="data")
@@ -145,6 +146,7 @@ def main(argv=None) -> int:
         model_size_mb=args.model_size_mb,
         max_tokens=args.max_tokens,
         enable_thinking=args.enable_thinking,
+        adapter_path=args.adapter_path,
     )
 
     traj_path = out_dir / "trajectories.jsonl"
