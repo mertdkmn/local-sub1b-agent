@@ -1,0 +1,40 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>City Library — Contact</title>
+</head>
+<body>
+  <nav>
+    <a id="nav-home" href="home.html">Home</a>
+    <a id="nav-catalog" href="catalog.html">Catalog</a>
+    <a id="nav-contact" href="contact.html">Contact</a>
+  </nav>
+
+  <h1>Contact</h1>
+
+  <form id="contact-form">
+    <label for="name">Name</label>
+    <input type="text" id="name" name="name">
+    <label for="email">Email</label>
+    <input type="email" id="email" name="email">
+    <label for="message">Message</label>
+    <textarea id="message" name="message"></textarea>
+    <button type="submit" id="submit-btn">Send</button>
+  </form>
+
+  <div id="sent" hidden>Message sent!</div>
+
+  <script>
+    document.getElementById('contact-form').addEventListener('submit', function (e) {
+      e.preventDefault();
+      var name = document.getElementById('name').value.trim();
+      var email = document.getElementById('email').value.trim();
+      var message = document.getElementById('message').value.trim();
+      if (name !== '' && email !== '' && message !== '') {
+        document.getElementById('sent').hidden = false;
+      }
+    });
+  </script>
+</body>
+</html>

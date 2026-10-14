@@ -1,0 +1,13 @@
+{
+  "task_id": "ho-nav-002",
+  "category": "navigation",
+  "goal": "Go to the Contact page",
+  "start_url": "heldout_fixtures/home.html",
+  "max_steps": 5,
+  "difficulty": "easy",
+  "oracle": {
+    "type": "final_url",
+    "expected": "heldout_fixtures/contact.html"
+  },
+  "failure_injection": []
+}

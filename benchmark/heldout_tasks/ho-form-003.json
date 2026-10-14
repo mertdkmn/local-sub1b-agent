@@ -1,0 +1,14 @@
+{
+  "task_id": "ho-form-003",
+  "category": "form",
+  "goal": "Type 'hello' into the message field",
+  "start_url": "heldout_fixtures/contact.html",
+  "max_steps": 5,
+  "difficulty": "easy",
+  "oracle": {
+    "type": "form_value",
+    "selector": "#message",
+    "value": "hello"
+  },
+  "failure_injection": []
+}

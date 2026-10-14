@@ -1,0 +1,44 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="utf-8">
+  <title>City Library — Catalog</title>
+</head>
+<body>
+  <nav>
+    <a id="nav-home" href="home.html">Home</a>
+    <a id="nav-catalog" href="catalog.html">Catalog</a>
+    <a id="nav-contact" href="contact.html">Contact</a>
+  </nav>
+
+  <h1>Catalog</h1>
+
+  <div class="book">
+    <h3>Dune</h3>
+    <p>Frank Herbert</p>
+    <button class="add-to-cart" data-book="dune">Add to cart</button>
+  </div>
+  <div class="book">
+    <h3>1984</h3>
+    <p>George Orwell</p>
+    <button class="add-to-cart" data-book="1984">Add to cart</button>
+  </div>
+  <div class="book">
+    <h3>Neuromancer</h3>
+    <p>William Gibson</p>
+    <button class="add-to-cart" data-book="neuromancer">Add to cart</button>
+  </div>
+
+  <p>Cart: <span id="cart-count">0</span> item(s)</p>
+
+  <script>
+    let count = 0;
+    document.querySelectorAll('.add-to-cart').forEach(function (btn) {
+      btn.addEventListener('click', function () {
+        count += 1;
+        document.getElementById('cart-count').textContent = String(count);
+      });
+    });
+  </script>
+</body>
+</html>

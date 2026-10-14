@@ -1,0 +1,14 @@
+{
+  "task_id": "ho-multi-001",
+  "category": "multi_step",
+  "goal": "Go to the Catalog page and add an item to the cart",
+  "start_url": "heldout_fixtures/home.html",
+  "max_steps": 10,
+  "difficulty": "medium",
+  "oracle": {
+    "type": "text",
+    "selector": "#cart-count",
+    "expected": "1"
+  },
+  "failure_injection": []
+}

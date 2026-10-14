@@ -1,0 +1,14 @@
+{
+  "task_id": "ho-form-002",
+  "category": "form",
+  "goal": "Type 'Alice' into the name field",
+  "start_url": "heldout_fixtures/contact.html",
+  "max_steps": 5,
+  "difficulty": "easy",
+  "oracle": {
+    "type": "form_value",
+    "selector": "#name",
+    "value": "Alice"
+  },
+  "failure_injection": []
+}

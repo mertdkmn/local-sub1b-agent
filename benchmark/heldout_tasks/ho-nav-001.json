@@ -1,0 +1,13 @@
+{
+  "task_id": "ho-nav-001",
+  "category": "navigation",
+  "goal": "Navigate to the Catalog page",
+  "start_url": "heldout_fixtures/home.html",
+  "max_steps": 5,
+  "difficulty": "easy",
+  "oracle": {
+    "type": "final_url",
+    "expected": "heldout_fixtures/catalog.html"
+  },
+  "failure_injection": []
+}
