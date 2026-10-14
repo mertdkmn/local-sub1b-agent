@@ -80,6 +80,12 @@ TASKS = [
     t("form-011", "form", "Type 'hunter2' into the password field", "fixtures/login.html", _form_value("#password", "hunter2")),
     t("form-012", "form", "Log in with username 'user1' and password 'pass123'", "fixtures/login.html", _visible("#login-success"), "medium", 10),
     t("form-013", "form", "Type 'guest' into the username field", "fixtures/login.html", _form_value("#username", "guest")),
+    t("form-014", "form", "Fill the contact form with name 'David' and email 'david@example.com' and submit", "fixtures/index.html", _visible("#success"), "medium", 10),
+    t("form-015", "form", "Fill the contact form with name 'Emma' and email 'emma@example.com' and submit", "fixtures/index.html", _visible("#success"), "medium", 10),
+    t("form-016", "form", "Fill the contact form with name 'Frank' and email 'frank@example.com' and submit", "fixtures/index.html", _visible("#success"), "medium", 10),
+    t("form-017", "form", "Fill the contact form with name 'Grace' and email 'grace@example.com' and submit", "fixtures/index.html", _visible("#success"), "medium", 10),
+    t("form-018", "form", "Fill the contact form with name 'Henry' and email 'henry@example.com' and submit", "fixtures/index.html", _visible("#success"), "medium", 10),
+    t("form-019", "form", "Fill the contact form with name 'Ivy' and email 'ivy@example.com' and submit", "fixtures/index.html", _visible("#success"), "medium", 10),
 
     # --- multi-step: at least two distinct action types ---
     t("multi-001", "multi_step", "Go to the Products page and add an item to the cart", "fixtures/index.html", _text("#cart-count", "1"), "medium", 10),
