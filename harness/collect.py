@@ -53,9 +53,14 @@ def collect_trajectory(
 
         spec = select(specs, i, action, seen)
         if spec is not None:
-            error = inject(action, spec)
-            injected = True
-            failure_type = failure_type or spec.type
+            error = inject(action, spec, page)
+            if error is None:
+                # stale_obs on ref=0: skip the injection, run the action normally
+                error = execute(page, action, base_dir)
+                injected = False
+            else:
+                injected = True
+                failure_type = failure_type or spec.type
         else:
             error = execute(page, action, base_dir)
             injected = False

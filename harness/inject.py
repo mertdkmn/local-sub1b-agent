@@ -29,6 +29,7 @@ _SIGNAL_TEXT = {
     "tool_error": "simulated failure",
     "missing_element": "element not found",
     "timeout": "timeout",
+    "stale_obs": "stale observation",
 }
 
 
@@ -74,9 +75,20 @@ def select(
     return None
 
 
-def inject(action: Action, spec: FailureInjection) -> str:
-    """Produce the injected failure's error signal in place of executing the action."""
+def inject(action: Action, spec: FailureInjection, page=None) -> str | None:
+    """Produce the injected failure's error signal in place of executing the action.
+
+    ``stale_obs`` is state-changing: it removes the first element
+    (``data-ref="0"``) so every later ref shifts down by one — the model's old
+    observation no longer matches the page. Returns ``None`` to signal "skip the
+    injection" when the action targets ref=0 (removing it would delete the target
+    itself, which is a missing_element scenario, not stale_obs).
+    """
     if spec.type in _SIGNAL_TEXT:
+        if spec.type == "stale_obs" and page is not None:
+            if action.args.get("ref") == 0:
+                return None
+            page.evaluate("document.querySelector('[data-ref=\"0\"]')?.remove()")
         return f"{action.tool} error: {_SIGNAL_TEXT[spec.type]}"
     raise NotImplementedError(
         f"failure_type '{spec.type}' is in the taxonomy but not implemented yet "
