@@ -59,4 +59,4 @@ experiments/   # experiments.csv + frontier plots
 - [x] P2 LoRA SFT: 0.6B student 35.6% → 95.6% std / 94% recovery (beats 91%/81% teacher, same-task)
 - [x] P3 held-out: student 40% → 90% on unseen site (= teacher 90%); generalizes, not memorizing
 - [x] P3 sweeps #1–#5 (data, loss-weight, observation format, tool space, form-state): all whack-a-mole/negative — see `experiments/P3_SWEEP6_STALEOBS.md` and RESEARCH_PLAN.md
-- [x] P3 sweep #6 (stale_obs recovery): **negative** — 27/51 std (−21), recovery 92%→59%; confounded by missing form-014..018 clean data; control pending
+- [x] P3 sweep #6 (stale_obs recovery): **rejected** — 27/51 std; 3-way ablation attributes the collapse to the 21 recovery-signal examples (not the missing clean data); see `experiments/P3_SWEEP6_STALEOBS.md`

@@ -143,12 +143,56 @@ steps, never `TYPE`. Valid-but-wrong — `tool_errors=0`. It locates the box but
 3. **`grad_checkpoint` differs** (true vs false) — benign, but noted for
    completeness.
 
-A clean **control** (84-clean-only, same hyperparams, same eval protocol) is
-required to attribute the regression: if 84-clean-only ≈ 48/51, the stale_obs
-data is the culprit; if ≈ 27/51, the missing form-014..018 data is.
+A clean **control** (84-clean-only, same hyperparams, same eval protocol) was
+run — see below; it **resolved** this confound.
+
+## Control experiment (2026-10-18) — confound RESOLVED
+
+> P3 Sweep #6 — Negative result with controlled data ablation. The initial
+> stale_obs experiment regressed from 48/51 to 27/51 on the normal benchmark and
+> from 24/26 to 14/26 on the common recovery evaluation set. Follow-up controls
+> showed that reducing the clean dataset from 102 to 84 examples accounted for
+> only a small performance decrease (48/51 to 45/51), while adding 34 clean-like
+> examples improved performance to 49/51. Adding the 21 post-injection recovery
+> examples then reduced performance to 27/51. The regression is therefore
+> associated with the recovery-example addition, not primarily with the missing
+> clean form examples. The search collapse and repeated CLICK behavior suggest
+> an action-distribution interference mechanism, which remains a hypothesis
+> rather than a proven causal mechanism. The stale_obs training intervention is
+> rejected in its current form.
+
+**Note on the first control runs (invalidated):** the first A/B1 trainings
+copied `--num-layers -1` from train.py's stale docstring. `-1` applies LoRA to
+*all* 28 layers (Qwen3-0.6B), whereas every training in this project uses
+`--num-layers 16`. Those runs were invalidated; **all corrected results below
+come from `--num-layers 16` trainings.**
+
+### Results (normal benchmark, 51 tasks, all `--num-layers 16`)
+
+| Experiment | Dataset | Normal |
+|---|---|---|
+| P3 formfix | 102 clean | 48/51 |
+| A — clean-only | 84 clean | 45/51 |
+| B1 — clean-like | 84 + 34 clean-like | 49/51 |
+| B2 — full stale_obs | 84 + 34 clean-like + 21 recovery | 27/51 |
+
+### Findings
+
+1. **Reducing clean data is not the main cause.** 102→84 examples lowered
+   48/51 → 45/51 (−3) — a regression, but it does not explain B2's collapse.
+2. **The 34 clean-like examples helped.** Adding them raised 45/51 → 49/51
+   (+4).
+3. **Adding the 21 recovery examples caused the collapse.** B1 → B2 dropped
+   49/51 → 27/51 (−22). Search collapsed 9/9 → 0/9, multi 12/13 → 5/13.
+
+The 21 recovery examples are 71% CLICK (15/21) vs 56% for the 34 clean-like
+examples (19/34), and B2 loops CLICK on search tasks — supporting the hypothesis
+that the recovery examples shifted the model's action distribution toward CLICK.
+This is a **hypothesis, not a proven causal mechanism**; B2's training dynamics
+and data distribution may also contribute.
 
 ## Next step
 
-1. Control experiment A — 84-clean-only training.
-2. Control experiment B — 84 clean + stale_obs (same clean set), same protocol.
-3. A/B isolates the stale_obs effect; then move to the quantization sweep.
+The stale_obs recovery intervention is **rejected in its current form**. Move to
+the quantization sweep: hold the p3-formfix adapter fixed and compare FP16 /
+8-bit / 4-bit on success + model size + memory + inference latency.
