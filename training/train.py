@@ -14,7 +14,13 @@ Run (clean-only first, per single-variable discipline):
   .venv/bin/python -m training.train \
       --train-data data/dataset_v1.jsonl \
       --adapter-path training/adapters/p2-clean \
-      --iters 200 --batch-size 4 --learning-rate 1e-4 --num-layers -1
+      --iters 200 --batch-size 4 --learning-rate 1e-4 --num-layers 16
+
+``num_layers`` controls how many transformer layers get LoRA adapters. The
+project convention is ``16`` (the ``mlx_lm`` default, and what p2-clean /
+p3-formfix / p3-staleobs all used). ``--num-layers -1`` means *all* layers —
+for Qwen3-0.6B that is 28, not 16 — so it diverges from every training run in
+this project. Omit the flag (or pass 16) to stay consistent.
 """
 from __future__ import annotations
 
