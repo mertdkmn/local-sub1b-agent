@@ -2,9 +2,30 @@
 
 How far can we push a **sub-1B parameter browser agent** under strict compute and memory constraints on **consumer hardware, locally**?
 
-This is a research project. The goal is not to build a small browser agent, but to characterize and extend the **capability-efficiency frontier** — how much browser-agent capability we can get per parameter, per MB of memory, and per unit of compute, and which techniques move that frontier.
+This is a research project. The goal is not to build a small browser agent, but to characterize and extend the **capability-efficiency frontier**: how much browser-agent capability we can get per parameter, per MB of memory, and per unit of compute, and which techniques move that frontier.
 
 See [`RESEARCH_PLAN.md`](RESEARCH_PLAN.md) for the full plan, locked decisions, and phase breakdown.
+
+## Paper
+
+**"The Instability of Recovery-Trajectory Supervision in Sub-1B Browser Agents"** ([`paper/main.pdf`](paper/main.pdf))
+
+A controlled study of whether adding recovery trajectories, episodes in which a
+failure was injected and a teacher recovered, makes a 0.6B browser agent more
+robust. The finding is that recovery supervision is unstable: the full recovery
+condition is bimodal across training seeds, and a subset of runs collapses to a
+policy that emits CLICK actions almost exclusively. Validation loss fails to
+detect the collapse, but a simple action-distribution statistic does. For local
+agent training, the practical conclusion is to select models with multiple seeds
+and action-distribution monitoring rather than validation loss.
+
+- **Composition ablation**: error-free versus error-containing recovery steps.
+- **Data-mixing sweep**: the instability is non-monotonic in the recovery fraction.
+- **Monitoring result**: validation loss is blind; the CLICK share detects collapse.
+- **Dynamics**: the collapse is a late-training bifurcation.
+
+The source is in [`paper/draft.md`](paper/draft.md); figures and LaTeX live under
+[`paper/`](paper/).
 
 ## TL;DR
 
